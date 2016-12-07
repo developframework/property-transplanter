@@ -9,6 +9,7 @@ public class DefaultTypeConverterRegistry extends TypeConverterRegistry{
      */
     public void registerDefaultTypeConverter() {
         registerTypeConverter(new ArrayToArrayConverter(super.propertyTransplanter));
+        registerTypeConverter(new ListToListConverter(super.propertyTransplanter));
         registerTypeConverter(new AnyToAnyConverter());
         registerTypeConverter(new AnyToStringConverter());
         registerTypeConverter(new StringToIntegerConverter());

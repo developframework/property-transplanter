@@ -1,5 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
+import com.github.developframework.transplanter.AnnotationWrapper;
 import com.github.developframework.transplanter.TypeConverter;
 
 public class AnyToStringConverter implements TypeConverter<Object, String> {
@@ -10,7 +11,7 @@ public class AnyToStringConverter implements TypeConverter<Object, String> {
     }
 
     @Override
-    public String convert(Object source, Class<String> targetType) {
+    public String convert(Object source, Class<String> targetType, AnnotationWrapper annotationWrapper) {
         return source == null ? null : source.toString();
     }
 }

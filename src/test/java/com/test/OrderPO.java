@@ -1,6 +1,9 @@
 package com.test;
 
+import com.github.developframework.transplanter.annotation.TargetItemType;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class OrderPO {
@@ -9,5 +12,6 @@ public class OrderPO {
 
     private String orderSn;
 
-    private OrderItemPO[] items;
+    @TargetItemType(OrderItemPO.class)
+    private List<OrderItemPO> items;
 }

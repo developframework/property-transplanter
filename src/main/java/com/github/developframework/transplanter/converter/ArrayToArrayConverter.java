@@ -1,5 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
+import com.github.developframework.transplanter.AnnotationWrapper;
 import com.github.developframework.transplanter.PropertyTransplanter;
 import com.github.developframework.transplanter.TypeConverter;
 
@@ -19,7 +20,7 @@ public class ArrayToArrayConverter implements TypeConverter<Object[], Object[]> 
     }
 
     @Override
-    public Object[] convert(Object[] source, Class<Object[]> targetType) {
+    public Object[] convert(Object[] source, Class<Object[]> targetType, AnnotationWrapper annotationWrapper) {
         Class<?> targetComponentType = targetType.getComponentType();
 
         Object[] objs = (Object[]) Array.newInstance(targetComponentType, source.length);

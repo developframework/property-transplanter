@@ -57,7 +57,6 @@ public abstract class TypeConverterRegistry {
     private Optional<TypeConverter<?, ?>> tryGetInTypeConverters(Class<?> sourceType, Class<?> targetType) {
         for(TypeConverter<?, ?> typeConverter : typeConverters) {
             if(typeConverter.matches(sourceType, targetType)) {
-                log.debug("TypeConverterRegistry matches \"{}\" for class cast \"{}\" to \"{}\"", typeConverter.getClass().getName(), sourceType.getName(), targetType.getName());
                 return Optional.of(typeConverter);
             }
         }

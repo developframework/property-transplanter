@@ -2,6 +2,8 @@ package com.test;
 
 import com.github.developframework.transplanter.PropertyTransplanter;
 
+import java.util.Arrays;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -10,7 +12,7 @@ public class Main {
         OrderItemDTO items2 = new OrderItemDTO(2, "cake", 5, 2);
         orderDTO.setId(1);
         orderDTO.setOrderSn("xxxx");
-        orderDTO.setItems(new OrderItemDTO[]{items1, items2});
+        orderDTO.setItems(Arrays.asList(items1, items2));
         System.out.println(orderDTO);
 
         PropertyTransplanter propertyTransplanter = new PropertyTransplanter();

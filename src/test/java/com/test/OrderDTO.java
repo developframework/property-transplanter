@@ -2,6 +2,8 @@ package com.test;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OrderDTO {
 
@@ -9,5 +11,5 @@ public class OrderDTO {
 
     private String orderSn;
 
-    private OrderItemDTO[] items;
+    private List<OrderItemDTO> items;
 }

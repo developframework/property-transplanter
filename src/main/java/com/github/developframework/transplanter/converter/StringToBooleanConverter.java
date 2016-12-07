@@ -1,5 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
+import com.github.developframework.transplanter.AnnotationWrapper;
 import com.github.developframework.transplanter.TypeConverter;
 
 /**
@@ -13,7 +14,7 @@ public class StringToBooleanConverter implements TypeConverter<String, Boolean> 
     }
 
     @Override
-    public Boolean convert(String source, Class<Boolean> targetType) {
+    public Boolean convert(String source, Class<Boolean> targetType, AnnotationWrapper annotationWrapper) {
         return null;
     }
 }

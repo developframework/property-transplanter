@@ -1,5 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
+import com.github.developframework.transplanter.AnnotationWrapper;
 import com.github.developframework.transplanter.TypeConverter;
 
 public class EnumToEnumConverter implements TypeConverter<Enum<?>, Enum<?>>{
@@ -10,7 +11,7 @@ public class EnumToEnumConverter implements TypeConverter<Enum<?>, Enum<?>>{
     }
 
     @Override
-    public Enum<?> convert(Enum<?> source, Class<Enum<?>> targetType) {
+    public Enum<?> convert(Enum<?> source, Class<Enum<?>> targetType, AnnotationWrapper annotationWrapper) {
         return null;
     }
 }

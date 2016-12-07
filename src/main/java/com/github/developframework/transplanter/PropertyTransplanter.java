@@ -1,16 +1,22 @@
 package com.github.developframework.transplanter;
 
+import com.github.developframework.transplanter.annotation.TargetItemType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.util.Optional;
 
 public class PropertyTransplanter {
+
+    private static final Logger log = LoggerFactory.getLogger(PropertyTransplanter.class);
 
     private TypeConverterRegistry typeConverterRegistry;
 
     public PropertyTransplanter() {
         this.typeConverterRegistry = new DefaultTypeConverterRegistry();
         this.typeConverterRegistry.setPropertyTransplanter(this);
-        ((DefaultTypeConverterRegistry)this.typeConverterRegistry).registerDefaultTypeConverter();
+        ((DefaultTypeConverterRegistry) this.typeConverterRegistry).registerDefaultTypeConverter();
     }
 
     public PropertyTransplanter(TypeConverterRegistry typeConverterRegistry) {
@@ -22,6 +28,7 @@ public class PropertyTransplanter {
     public <S, T> T propertyTransplant(S source, Class<T> targetType) {
         T target = null;
         final Class<S> sourceType = (Class<S>) source.getClass();
+        log.debug("-------------Begin transplant \"{}\" to class \"{}\".", sourceType.getName(), targetType.getName());
         try {
             target = targetType.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -34,7 +41,7 @@ public class PropertyTransplanter {
             Optional<Field> sourceFieldOptional = trySearchFieldInSourceType(sourceType, targetField.getName());
             if (sourceFieldOptional.isPresent()) {
                 //从源实例获取属性值
-                Object value = getPropertyValueFromSourceInstance(source, sourceFieldOptional.get(), targetField.getType());
+                Object value = getPropertyValueFromSourceInstance(source, sourceFieldOptional.get(), targetField);
                 if (value != null) {
                     //移植值到源实例
                     transplantValueToTargetInstance(target, targetField, value);
@@ -46,6 +53,7 @@ public class PropertyTransplanter {
 
     /**
      * 尝试从源类型查询目标对应属性
+     *
      * @param sourceType
      * @param fieldName
      * @return
@@ -62,19 +70,25 @@ public class PropertyTransplanter {
 
     /**
      * 从源实例获取属性值
+     *
      * @param sourceInstance
      * @param sourceField
-     * @param targetType
+     * @param targetField
      * @param <S>
      * @param <T>
      * @return
      */
     @SuppressWarnings("unchecked")
-    private <S, T> T getPropertyValueFromSourceInstance(Object sourceInstance, Field sourceField, Class<T> targetType) {
+    private <S, T> T getPropertyValueFromSourceInstance(Object sourceInstance, Field sourceField, Field targetField) {
+        Class<T> targetType = (Class<T>) targetField.getType();
         TypeConverter<S, T> typeConverter = (TypeConverter<S, T>) typeConverterRegistry.extractTypeConverter(sourceField.getType(), targetType);
+        if (log.isDebugEnabled()) {
+            log.debug("Try to transplant property \"{}\", TypeConverterRegistry matches \"{}\" for class cast \"{}\" to \"{}\"", sourceField.getName(), typeConverter.getClass().getSimpleName(), sourceField.getType().getName(), targetType.getName());
+        }
+        AnnotationWrapper annotationWrapper = getAnnotationWrapper(targetField);
         try {
             S sourceFieldValue = (S) sourceField.get(sourceInstance);
-            return typeConverter.convert(sourceFieldValue, targetType);
+            return typeConverter.convert(sourceFieldValue, targetType, annotationWrapper);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -83,6 +97,7 @@ public class PropertyTransplanter {
 
     /**
      * 移植值到源实例
+     *
      * @param targetInstance
      * @param targetField
      * @param value
@@ -94,5 +109,11 @@ public class PropertyTransplanter {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private AnnotationWrapper getAnnotationWrapper(Field field) {
+        AnnotationWrapper annotationWrapper = new AnnotationWrapper();
+        annotationWrapper.setTargetItemType(field.getDeclaredAnnotation(TargetItemType.class));
+        return annotationWrapper;
     }
 }
