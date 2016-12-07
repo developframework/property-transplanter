@@ -2,11 +2,9 @@ package com.github.developframework.transplanter.converter;
 
 import com.github.developframework.transplanter.AnnotationWrapper;
 import com.github.developframework.transplanter.TypeConverter;
+import com.github.developframework.transplanter.TypeConverterRegistry;
 
-/**
- * Created by Administrator on 2016/12/6.
- */
-public class StringToBooleanConverter implements TypeConverter<String, Boolean> {
+public class StringToBooleanConverter extends AbstractTypeConverter<String, Boolean> {
 
     @Override
     public boolean matches(Class<?> sourceType, Class<?> targetType) {
@@ -14,7 +12,7 @@ public class StringToBooleanConverter implements TypeConverter<String, Boolean> 
     }
 
     @Override
-    public Boolean convert(String source, Class<Boolean> targetType, AnnotationWrapper annotationWrapper) {
-        return null;
+    public Boolean convert(TypeConverterRegistry typeConverterRegistry, String source, Class<Boolean> targetType, AnnotationWrapper annotationWrapper) {
+        return source == null? null : Boolean.parseBoolean(source);
     }
 }

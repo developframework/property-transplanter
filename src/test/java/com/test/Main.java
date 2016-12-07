@@ -13,6 +13,7 @@ public class Main {
         orderDTO.setId(1);
         orderDTO.setOrderSn("xxxx");
         orderDTO.setItems(Arrays.asList(items1, items2));
+        orderDTO.setOrderStatus(OrderDTO.Status.WAIT_PAY);
         System.out.println(orderDTO);
 
         PropertyTransplanter propertyTransplanter = new PropertyTransplanter();

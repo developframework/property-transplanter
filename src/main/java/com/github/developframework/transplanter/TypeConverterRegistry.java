@@ -12,12 +12,6 @@ public abstract class TypeConverterRegistry {
 
     private List<TypeConverter<?, ?>> typeConverters = new ArrayList<>();
 
-    protected PropertyTransplanter propertyTransplanter;
-
-    public void setPropertyTransplanter(PropertyTransplanter propertyTransplanter) {
-        this.propertyTransplanter = propertyTransplanter;
-    }
-
     /**
      * 注册TypeConverter
      * @param typeConverter

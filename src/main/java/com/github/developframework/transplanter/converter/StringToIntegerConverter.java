@@ -2,6 +2,7 @@ package com.github.developframework.transplanter.converter;
 
 import com.github.developframework.transplanter.AnnotationWrapper;
 import com.github.developframework.transplanter.TypeConverter;
+import com.github.developframework.transplanter.TypeConverterRegistry;
 
 public class StringToIntegerConverter implements TypeConverter<String, Integer>{
     @Override
@@ -10,7 +11,7 @@ public class StringToIntegerConverter implements TypeConverter<String, Integer>{
     }
 
     @Override
-    public Integer convert(String source, Class<Integer> targetType, AnnotationWrapper annotationWrapper) {
+    public Integer convert(TypeConverterRegistry typeConverterRegistry, String source, Class<Integer> targetType, AnnotationWrapper annotationWrapper) {
         return source == null ? null : Integer.parseInt(source);
     }
 }

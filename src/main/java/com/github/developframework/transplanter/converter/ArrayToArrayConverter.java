@@ -1,18 +1,12 @@
 package com.github.developframework.transplanter.converter;
 
 import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.PropertyTransplanter;
 import com.github.developframework.transplanter.TypeConverter;
+import com.github.developframework.transplanter.TypeConverterRegistry;
 
 import java.lang.reflect.Array;
 
-public class ArrayToArrayConverter implements TypeConverter<Object[], Object[]> {
-
-    private PropertyTransplanter propertyTransplanter;
-
-    public ArrayToArrayConverter(PropertyTransplanter propertyTransplanter) {
-        this.propertyTransplanter = propertyTransplanter;
-    }
+public class ArrayToArrayConverter extends CollectionToCollectionConverter<Object[], Object[]> {
 
     @Override
     public boolean matches(Class<?> sourceType, Class<?> targetType) {
@@ -20,12 +14,16 @@ public class ArrayToArrayConverter implements TypeConverter<Object[], Object[]> 
     }
 
     @Override
-    public Object[] convert(Object[] source, Class<Object[]> targetType, AnnotationWrapper annotationWrapper) {
-        Class<?> targetComponentType = targetType.getComponentType();
+    @SuppressWarnings("unchecked")
+    public Object[] convert(TypeConverterRegistry typeConverterRegistry, Object[] source, Class<Object[]> targetType, AnnotationWrapper annotationWrapper) {
+
+        Class<Object> sourceComponentType = (Class<Object>)source.getClass().getComponentType();
+        Class<Object> targetComponentType = (Class<Object>)targetType.getComponentType();
 
         Object[] objs = (Object[]) Array.newInstance(targetComponentType, source.length);
+        TypeConverter<Object, Object> typeConverter = (TypeConverter<Object, Object>) typeConverterRegistry.extractTypeConverter(sourceComponentType, targetComponentType);
         for (int i = 0; i < source.length; i++) {
-            objs[i] = propertyTransplanter.propertyTransplant(source[i], targetComponentType);
+            objs[i] = typeConverter.convert(typeConverterRegistry, source[i], targetComponentType, new AnnotationWrapper());
         }
         return objs;
     }

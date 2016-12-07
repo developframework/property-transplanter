@@ -17,10 +17,11 @@ public interface TypeConverter<S, T> {
 
     /**
      * 转换方法
+     * @param typeConverterRegistry 注册器
      * @param source 源实例
      * @param targetType 目标类型
      * @param annotationWrapper 注解包装
      * @return 目标实例
      */
-    T convert(S source, Class<T> targetType, AnnotationWrapper annotationWrapper);
+    T convert(TypeConverterRegistry typeConverterRegistry, S source, Class<T> targetType, AnnotationWrapper annotationWrapper);
 }

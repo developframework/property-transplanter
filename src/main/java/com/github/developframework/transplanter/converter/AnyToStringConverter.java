@@ -1,9 +1,9 @@
 package com.github.developframework.transplanter.converter;
 
 import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.TypeConverter;
+import com.github.developframework.transplanter.TypeConverterRegistry;
 
-public class AnyToStringConverter implements TypeConverter<Object, String> {
+public class AnyToStringConverter extends AbstractTypeConverter<Object, String> {
 
     @Override
     public boolean matches(Class<?> sourceType, Class<?> targetType) {
@@ -11,7 +11,7 @@ public class AnyToStringConverter implements TypeConverter<Object, String> {
     }
 
     @Override
-    public String convert(Object source, Class<String> targetType, AnnotationWrapper annotationWrapper) {
+    public String convert(TypeConverterRegistry typeConverterRegistry, Object source, Class<String> targetType, AnnotationWrapper annotationWrapper) {
         return source == null ? null : source.toString();
     }
 }
