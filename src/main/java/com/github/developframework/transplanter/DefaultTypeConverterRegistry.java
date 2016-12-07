@@ -12,13 +12,14 @@ public class DefaultTypeConverterRegistry extends TypeConverterRegistry{
         registerTypeConverter(new ArrayToListConverter());
         registerTypeConverter(new ListToListConverter());
         registerTypeConverter(new ListToArrayConverter());
+        registerTypeConverter(new SetToSetConverter());
         registerTypeConverter(new MapToMapConverter());
         registerTypeConverter(new EnumToEnumConverter());
         registerTypeConverter(new AnyToAnyConverter());
-        registerTypeConverter(new AnyToOtherConverter());
         registerTypeConverter(new AnyToStringConverter());
         registerTypeConverter(new StringToIntegerConverter());
         registerTypeConverter(new StringToLongConverter());
         registerTypeConverter(new StringToBooleanConverter());
+        registerTypeConverter(new AnyToOtherConverter());
     }
 }
