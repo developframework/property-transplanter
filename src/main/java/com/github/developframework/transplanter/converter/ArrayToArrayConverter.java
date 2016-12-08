@@ -1,12 +1,10 @@
 package com.github.developframework.transplanter.converter;
 
-import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.TypeConverter;
-import com.github.developframework.transplanter.TypeConverterRegistry;
+import com.github.developframework.transplanter.*;
 
 import java.lang.reflect.Array;
 
-public class ArrayToArrayConverter extends CollectionToCollectionConverter<Object[], Object[]> {
+public class ArrayToArrayConverter extends AbstractTypeConverter<Object[], Object[]> {
 
     @Override
     public boolean matches(Class<?> sourceType, Class<?> targetType) {
@@ -15,15 +13,16 @@ public class ArrayToArrayConverter extends CollectionToCollectionConverter<Objec
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object[] convert(TypeConverterRegistry typeConverterRegistry, Object[] source, Class<Object[]> targetType, AnnotationWrapper annotationWrapper) {
+    public Object[] convert(TypeConverterRegistry typeConverterRegistry, SourceInformation<Object[]> sourceInformation, TargetInformation<Object[]> targetInformation) {
+        Class<Object> sourceComponentType = (Class<Object>) sourceInformation.getSourceItemType();
+        Class<Object> targetComponentType = (Class<Object>) targetInformation.getTargetItemType();
 
-        Class<Object> sourceComponentType = (Class<Object>)source.getClass().getComponentType();
-        Class<Object> targetComponentType = (Class<Object>)targetType.getComponentType();
-
-        Object[] objs = (Object[]) Array.newInstance(targetComponentType, source.length);
+        Object[] source = sourceInformation.getSource();
+        int size = sourceInformation.getSource().length;
+        Object[] objs = (Object[]) Array.newInstance(targetComponentType, size);
         TypeConverter<Object, Object> typeConverter = (TypeConverter<Object, Object>) typeConverterRegistry.extractTypeConverter(sourceComponentType, targetComponentType);
-        for (int i = 0; i < source.length; i++) {
-            objs[i] = typeConverter.convert(typeConverterRegistry, source[i], targetComponentType, new AnnotationWrapper());
+        for (int i = 0; i < size; i++) {
+            objs[i] = convertCollectionItem(typeConverterRegistry, typeConverter, sourceComponentType, targetComponentType, source[i]);
         }
         return objs;
     }

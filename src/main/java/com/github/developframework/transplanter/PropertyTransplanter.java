@@ -18,9 +18,20 @@ public class PropertyTransplanter {
         this.typeConverterRegistry = typeConverterRegistry;
     }
 
-    @SuppressWarnings("unchecked")
     public <S, T> T propertyTransplant(S source, Class<T> targetType) {
+        return propertyTransplant(source, null, targetType, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <S, T> T propertyTransplant(S source, Class<?> sourceItemType, Class<T> targetType, Class<?> targetItemType) {
         TypeConverter<S, T> typeConverter = (TypeConverter<S, T>) typeConverterRegistry.extractTypeConverter(source.getClass(), targetType);
-        return typeConverter.convert(typeConverterRegistry, source, targetType, new AnnotationWrapper());
+        SourceInformation<S> sourceInformation = new SourceInformation<>();
+        sourceInformation.setSource(source);
+        sourceInformation.setSourceType((Class<S>) source.getClass());
+        sourceInformation.setSourceItemType(sourceItemType);
+        TargetInformation<T> targetInformation = new TargetInformation<>();
+        targetInformation.setTargetType(targetType);
+        targetInformation.setTargetItemType(targetItemType);
+        return typeConverter.convert(typeConverterRegistry, sourceInformation, targetInformation);
     }
 }

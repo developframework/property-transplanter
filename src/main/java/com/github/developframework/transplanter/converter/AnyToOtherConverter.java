@@ -1,8 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
-import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.TypeConverter;
-import com.github.developframework.transplanter.TypeConverterRegistry;
+import com.github.developframework.transplanter.*;
 import com.github.developframework.transplanter.annotation.SourceItemType;
 import com.github.developframework.transplanter.annotation.TargetItemType;
 import org.slf4j.Logger;
@@ -22,23 +20,22 @@ public class AnyToOtherConverter extends AbstractTypeConverter<Object, Object>{
     }
 
     @Override
-    public Object convert(TypeConverterRegistry typeConverterRegistry, Object source, Class<Object> targetType, AnnotationWrapper annotationWrapper) {
-        Object target = null;
-        final Class<?> sourceType = source.getClass();
-        log.debug("-------------Begin transplant \"{}\" to class \"{}\".", sourceType.getName(), targetType.getName());
+    public Object convert(TypeConverterRegistry typeConverterRegistry, SourceInformation<Object> sourceInformation, TargetInformation<Object> targetInformation) {
+        Object target;
+        log.debug("-------------Begin transplant \"{}\" to class \"{}\".", sourceInformation.getSourceType().getName(), targetInformation.getTargetType().getName());
         try {
-            target = targetType.newInstance();
+            target = targetInformation.getTargetType().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }
-        Field[] targetFields = targetType.getDeclaredFields();
+        Field[] targetFields = targetInformation.getTargetType().getDeclaredFields();
         for (Field targetField : targetFields) {
             //尝试从源类型查询目标对应属性
-            Optional<Field> sourceFieldOptional = trySearchFieldInSourceType(sourceType, targetField.getName());
+            Optional<Field> sourceFieldOptional = trySearchFieldInSourceType(sourceInformation.getSourceType(), targetField.getName());
             if (sourceFieldOptional.isPresent()) {
                 //从源实例获取属性值
-                Object value = getPropertyValueFromSourceInstance(typeConverterRegistry, source, sourceFieldOptional.get(), targetField);
+                Object value = getPropertyValueFromSourceInstance(typeConverterRegistry, sourceInformation.getSource(), sourceFieldOptional.get(), targetField);
                 if (value != null) {
                     //移植值到源实例
                     transplantValueToTargetInstance(target, targetField, value);
@@ -67,7 +64,7 @@ public class AnyToOtherConverter extends AbstractTypeConverter<Object, Object>{
 
     /**
      * 从源实例获取属性值
-     *
+     * @param typeConverterRegistry
      * @param sourceInstance
      * @param sourceField
      * @param targetField
@@ -82,10 +79,11 @@ public class AnyToOtherConverter extends AbstractTypeConverter<Object, Object>{
         if (log.isDebugEnabled()) {
             log.debug("Try to transplant property \"{}\", TypeConverterRegistry matches \"{}\" for class cast \"{}\" to \"{}\"", sourceField.getName(), typeConverter.getClass().getSimpleName(), sourceField.getType().getName(), targetType.getName());
         }
-        AnnotationWrapper annotationWrapper = getAnnotationWrapper(sourceField, targetField);
         try {
             S sourceFieldValue = (S) sourceField.get(sourceInstance);
-            return typeConverter.convert(typeConverterRegistry, sourceFieldValue, targetType, annotationWrapper);
+            SourceInformation<S> sourceInformation = super.createSourceInformation(sourceFieldValue, sourceField);
+            TargetInformation<T> targetInformation = super.createTargetInformation(targetField);
+            return typeConverter.convert(typeConverterRegistry, sourceInformation, targetInformation);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -108,10 +106,4 @@ public class AnyToOtherConverter extends AbstractTypeConverter<Object, Object>{
         }
     }
 
-    private AnnotationWrapper getAnnotationWrapper(Field sourceField, Field targetField) {
-        AnnotationWrapper annotationWrapper = new AnnotationWrapper();
-        annotationWrapper.setSourceItemType(sourceField.getDeclaredAnnotation(SourceItemType.class));
-        annotationWrapper.setTargetItemType(targetField.getDeclaredAnnotation(TargetItemType.class));
-        return annotationWrapper;
-    }
 }

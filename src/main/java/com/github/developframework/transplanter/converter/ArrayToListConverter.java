@@ -1,14 +1,14 @@
 package com.github.developframework.transplanter.converter;
 
-import com.github.developframework.transplanter.AnnotationWrapper;
+import com.github.developframework.transplanter.SourceInformation;
+import com.github.developframework.transplanter.TargetInformation;
 import com.github.developframework.transplanter.TypeConverter;
 import com.github.developframework.transplanter.TypeConverterRegistry;
-import com.github.developframework.transplanter.annotation.TargetItemType;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArrayToListConverter extends CollectionToCollectionConverter<Object[], List<?>>{
+public class ArrayToListConverter extends AbstractTypeConverter<Object[], List<?>>{
 
 
     @Override
@@ -18,13 +18,16 @@ public class ArrayToListConverter extends CollectionToCollectionConverter<Object
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<?> convert(TypeConverterRegistry typeConverterRegistry, Object[] source, Class<List<?>> targetType, AnnotationWrapper annotationWrapper) {
-        TargetItemType targetItemTypeAnnotation = super.getTargetItemTypeAnnotation(annotationWrapper);
-        Class<Object> sourceComponentType = (Class<Object>)source.getClass().getComponentType();
-        List list = new ArrayList(source.length);
-        TypeConverter<Object, Object> typeConverter = (TypeConverter<Object, Object>) typeConverterRegistry.extractTypeConverter(sourceComponentType, targetItemTypeAnnotation.value());
-        for (Object item : source) {
-            Object obj = typeConverter.convert(typeConverterRegistry, item, (Class<Object>) targetItemTypeAnnotation.value(), new AnnotationWrapper());
+    public List<?> convert(TypeConverterRegistry typeConverterRegistry, SourceInformation<Object[]> sourceInformation, TargetInformation<List<?>> targetInformation) {
+        Class<Object> sourceComponentType = (Class<Object>) sourceInformation.getSourceItemType();
+        Class<Object> targetComponentType = (Class<Object>) targetInformation.getTargetItemType();
+
+        List list = new ArrayList(sourceInformation.getSource().length);
+        TypeConverter<Object, Object> typeConverter = (TypeConverter<Object, Object>) typeConverterRegistry.extractTypeConverter(sourceComponentType, targetComponentType);
+        for (Object item : sourceInformation.getSource()) {
+            SourceInformation<Object> childSourceInformation = createSourceInformation(item, sourceComponentType);
+            TargetInformation<Object> childTargetInformation = createTargetInformation(targetComponentType);
+            Object obj = typeConverter.convert(typeConverterRegistry, childSourceInformation, childTargetInformation);
             list.add(obj);
         }
         return list;

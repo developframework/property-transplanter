@@ -1,28 +1,49 @@
 package com.github.developframework.transplanter.converter;
 
 
-import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.annotation.SourceItemType;
-import com.github.developframework.transplanter.annotation.TargetItemType;
-import com.github.developframework.transplanter.exception.UndefinedSourceItemTypeException;
-import com.github.developframework.transplanter.exception.UndefinedTargetItemTypeException;
+import com.github.developframework.transplanter.SourceInformation;
+import com.github.developframework.transplanter.TargetInformation;
+import com.github.developframework.transplanter.TypeConverter;
+import com.github.developframework.transplanter.TypeConverterRegistry;
 
-public abstract class CollectionToCollectionConverter<S, T> extends AbstractTypeConverter<S, T>{
+import java.util.Collection;
+import java.util.Iterator;
 
+public abstract class CollectionToCollectionConverter<S extends Collection<Object>, T extends Collection<Object>> extends AbstractTypeConverter<S, T> {
 
-    protected SourceItemType getSourceItemTypeAnnotation(AnnotationWrapper annotationWrapper) {
-        SourceItemType sourceItemTypeAnnotation = annotationWrapper.getSourceItemType();
-        if (sourceItemTypeAnnotation == null) {
-            throw new UndefinedSourceItemTypeException();
+    @Override
+    @SuppressWarnings("unchecked")
+    public T convert(TypeConverterRegistry typeConverterRegistry, SourceInformation<S> sourceInformation, TargetInformation<T> targetInformation) {
+        Class<Object> sourceComponentType = (Class<Object>) sourceInformation.getSourceItemType();
+        Class<Object> targetComponentType = (Class<Object>) targetInformation.getTargetItemType();
+        T targetCollection = targetCollection(size(sourceInformation));
+        TypeConverter<Object, Object> typeConverter = (TypeConverter<Object, Object>) typeConverterRegistry.extractTypeConverter(sourceComponentType, targetComponentType);
+        for(Iterator iterator = iterator(sourceInformation); iterator.hasNext();) {
+            Object obj = convertCollectionItem(typeConverterRegistry, typeConverter, sourceComponentType, targetComponentType, iterator.next());
+            targetCollection.add(obj);
         }
-        return sourceItemTypeAnnotation;
+        return targetCollection;
     }
 
-    protected TargetItemType getTargetItemTypeAnnotation(AnnotationWrapper annotationWrapper) {
-        TargetItemType targetItemTypeAnnotation = annotationWrapper.getTargetItemType();
-        if (targetItemTypeAnnotation == null) {
-            throw new UndefinedTargetItemTypeException();
-        }
-        return targetItemTypeAnnotation;
-    }
+    /**
+     * 获取源集合的迭代器
+     * @param sourceInformation
+     * @return
+     */
+    abstract Iterator<Object> iterator(SourceInformation<S> sourceInformation);
+
+    /**
+     * 获取源集合的长度
+     * @param sourceInformation
+     * @return
+     */
+    abstract int size(SourceInformation<S> sourceInformation);
+
+    /**
+     * 申明目标集合
+     * @param size
+     * @return
+     */
+    abstract T targetCollection(int size);
+
 }

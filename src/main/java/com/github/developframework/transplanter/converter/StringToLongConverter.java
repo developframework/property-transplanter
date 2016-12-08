@@ -1,8 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
-import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.TypeConverter;
-import com.github.developframework.transplanter.TypeConverterRegistry;
+import com.github.developframework.transplanter.*;
 
 public class StringToLongConverter implements TypeConverter<String, Long> {
     @Override
@@ -11,7 +9,7 @@ public class StringToLongConverter implements TypeConverter<String, Long> {
     }
 
     @Override
-    public Long convert(TypeConverterRegistry typeConverterRegistry, String source, Class<Long> targetType, AnnotationWrapper annotationWrapper) {
-        return source == null ? null : Long.parseLong(source);
+    public Long convert(TypeConverterRegistry typeConverterRegistry, SourceInformation<String> sourceInformation, TargetInformation<Long> targetInformation) {
+        return sourceInformation.getSource() == null ? null : Long.parseLong(sourceInformation.getSource());
     }
 }

@@ -1,8 +1,6 @@
 package com.github.developframework.transplanter.converter;
 
-import com.github.developframework.transplanter.AnnotationWrapper;
-import com.github.developframework.transplanter.TypeConverter;
-import com.github.developframework.transplanter.TypeConverterRegistry;
+import com.github.developframework.transplanter.*;
 
 public class AnyToAnyConverter extends AbstractTypeConverter<Object, Object>{
 
@@ -12,7 +10,8 @@ public class AnyToAnyConverter extends AbstractTypeConverter<Object, Object>{
     }
 
     @Override
-    public Object convert(TypeConverterRegistry typeConverterRegistry, Object source, Class<Object> targetType, AnnotationWrapper annotationWrapper) {
-        return source;
+    public Object convert(TypeConverterRegistry typeConverterRegistry, SourceInformation<Object> sourceInformation, TargetInformation<Object> targetInformation) {
+        return sourceInformation.getSource();
     }
+
 }
